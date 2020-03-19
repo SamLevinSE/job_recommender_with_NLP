@@ -146,6 +146,7 @@ def disply_applicant(user_id, dataframe=user):
     return 'User id is not in the DB.'
 
 selected_user = disply_applicant(326)
+
 vectorizer = TfidfVectorizer()
 tf_idf_job = vectorizer.fit_transform((jobs['Corpus']))
 tf_idf_user = vectorizer.transform(selected_user['Corpus'])
@@ -169,5 +170,17 @@ def get_recommendation(user, top_recommended, scores, jobs_title=jobs_title):
     return _result
 
 print(f'\n get_recommendation\n{get_recommendation(326, _top, list_scores)}')
+
+########### KNN
+from sklearn.neighbors import NearestNeighbors
+
+model = NearestNeighbors(n_neighbors=10, p=2)
+model.fit(tf_idf_job)
+model_output = model.kneighbors(tf_idf_user, return_distance=True)
+
+_top = model_output[1][0][1:]
+list_scores = model_output[0][0][1:]
+
+print(f'KNN model recommendations:\n{get_recommendation(326, _top, list_scores)}')
 
 print('\nEnd of the script!\n')
